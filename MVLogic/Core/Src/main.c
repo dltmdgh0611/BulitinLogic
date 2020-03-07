@@ -38,7 +38,6 @@
 /* USER CODE BEGIN PTD */
 int _write(int file, char *p, int len){
 	HAL_UART_Transmit(&huart3, p, len, 10);
-	return len;
 }
 /* USER CODE END PTD */
 
@@ -106,19 +105,20 @@ int main(void)
   HAL_TIM_Base_Start(&htim2);
   MVCD_ST7920_baseinit();
   MVCD_ST7920_GraphicMode(ON);
+  MVCD_LCDclear();
+  HAL_Delay(1);
+  HAL_TIM_Base_Start_IT(&htim3);
+
 //  MVCD_DrawBitmap(cubelogo);
 //  HAL_Delay(5000);
-  MVCD_LCDclear();
 
-  for(int i=0;i<100;i++){
-	  if(i%3==0) HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_RESET);
-	  else HAL_GPIO_WritePin(GPIOE, GPIO_PIN_6, GPIO_PIN_SET);
-	  //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_6);
-	  LogicAnalyzer(GPIOE, GPIO_PIN_6, 100, MS); //break;
-	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
-	  HAL_Delay(100);
 
-  }
+//  for(int i=0;i<50;i++){
+//
+//
+//
+//
+//  }
 
 
 
@@ -129,6 +129,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+//	  for(int i=0;i<10;i++) MVCD_delay_us(500);
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+//	  for(int i=0;i<10;i++) MVCD_delay_us(2000);
+	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+	  MVCD_delay_us(10000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
