@@ -165,9 +165,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		}
 		else if(sel == 3) {
 			i=0;
-			printf("ss\n");
 		}
 		else if(sel == 4) startTrigger = 4;
+		else if(sel == 0){
+			startTrigger = 0;
+		}
 	}
 }
 /* USER CODE END 1 */

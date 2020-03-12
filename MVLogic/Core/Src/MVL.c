@@ -12,7 +12,9 @@ int AX = 0;
 unsigned long count=0;
 unsigned long fcount=0;
 int logicarr[64];
+int prevlogicarr[64];
 int x=0;
+int movex=0;
 
 
 int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, int S, int StartTrigger){
@@ -20,7 +22,8 @@ int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, 
 	if(StartTrigger == 0){
 		if(curdelay*10 == delay*S){
 			AX++;
-			if(AX > 64){
+			if(AX == 64){
+				printf("2\n");
 				return 2;
 			}
 			_Bool readpin = HAL_GPIO_ReadPin(GPIOx, pinnum);
@@ -28,27 +31,19 @@ int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, 
 			if(readpin){
 				if(Toggles == readpin){
 					logicarr[AX]=1;
-					//printf("h\n");
 				}
 				else{
 					logicarr[AX]=3;
-					//printf("h\n");
 				}
-
 				Toggles = 1;
 			}
 			else{
 				if(Toggles == readpin){
-
 					logicarr[AX]=0;
-					//printf("l\n");
 				}
 				else{
-
 					logicarr[AX]=2;
-					//printf("l\n");
 				}
-
 				Toggles = 0;
 			}
 			return 1;
@@ -57,33 +52,24 @@ int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, 
 	}
 	else if(StartTrigger == 2){
 		//printf("%d\n",curdelay);
-
-		if(curdelay == 1000){
-			if(logicarr[x] == 0){
-				MVCD_dot_xy(x*2, 40);
-				MVCD_dot_xy(x*2+1, 40);
-			}
-			else if(logicarr[x] == 1){
-				MVCD_dot_xy(x*2, 20);
-				MVCD_dot_xy(x*2+1, 20);
-			}
-			else if(logicarr[x] == 2){
-				MVCD_dot_xy(x*2, 40);
-				for(int i=1;i<=20;i++){
-					MVCD_dot_xy(x*2, 40-i);
-				}
-				MVCD_dot_xy(x*2+1, 40);
-			}
-			else if(logicarr[x] == 3){
-				MVCD_dot_xy(x*2, 20);
-				for(int i=1;i<=20;i++){
-					MVCD_dot_xy(x*2, 20+i);
-				}
-				MVCD_dot_xy(x*2+1, 20);
-			}
+		if(curdelay == 10){
+			logicdraw(x, prevlogicarr, 0);
 			x++;
 			if(x>63){
 				x=0;
+				movex++;
+				for(int x=0;x<=63;x++){
+					logicdraw(x, prevlogicarr, 1);
+				}
+				for(int k=0;k<movex;k++){
+
+					prevlogicarr[64-movex+k] = logicarr[k];
+				}
+				for(int j=0;j<64-movex;j++){
+					prevlogicarr[j] = prevlogicarr[j+1];
+				}
+			}
+			if(movex>=63){
 				return 4;
 			}
 			return 3;
@@ -91,7 +77,64 @@ int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, 
 		return 5;
 
 	}
+	else if(StartTrigger == 4){
+		AX=0;
+		x=0;
+		movex=0;
+		StartTrigger=0;
+		return 0;
+	}
+}
 
+void logicdraw(int x, int logicarr[], _Bool delflag){
+	if(!delflag){
+		if(prevlogicarr[x] == 0){
+			MVCD_dot_xy(x*2, 40);
+			MVCD_dot_xy(x*2+1, 40);
+		}
+		else if(prevlogicarr[x] == 1){
+			MVCD_dot_xy(x*2, 20);
+			MVCD_dot_xy(x*2+1, 20);
+		}
+		else if(prevlogicarr[x] == 2){
+			MVCD_dot_xy(x*2, 40);
+			for(int i=1;i<=20;i++){
+				MVCD_dot_xy(x*2, 40-i);
+			}
+			MVCD_dot_xy(x*2+1, 40);
+		}
+		else if(prevlogicarr[x] == 3){
+			MVCD_dot_xy(x*2, 20);
+			for(int i=1;i<=20;i++){
+				MVCD_dot_xy(x*2, 20+i);
+			}
+			MVCD_dot_xy(x*2+1, 20);
+		}
+	}
+	else {
+		if(prevlogicarr[x] == 0){
+			MVCD_deldot_xy(x*2, 40);
+			MVCD_deldot_xy(x*2+1, 40);
+		}
+		else if(prevlogicarr[x] == 1){
+			MVCD_deldot_xy(x*2, 20);
+			MVCD_deldot_xy(x*2+1, 20);
+		}
+		else if(prevlogicarr[x] == 2){
+			MVCD_deldot_xy(x*2, 40);
+			for(int i=1;i<=20;i++){
+				MVCD_deldot_xy(x*2, 40-i);
+			}
+			MVCD_deldot_xy(x*2+1, 40);
+		}
+		else if(prevlogicarr[x] == 3){
+			MVCD_deldot_xy(x*2, 20);
+			for(int i=1;i<=20;i++){
+				MVCD_deldot_xy(x*2, 20+i);
+			}
+			MVCD_deldot_xy(x*2+1, 20);
+		}
+	}
 }
 
 

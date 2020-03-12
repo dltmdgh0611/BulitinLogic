@@ -129,12 +129,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-//	  for(int i=0;i<10;i++) MVCD_delay_us(500);
-//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-//	  for(int i=0;i<10;i++) MVCD_delay_us(2000);
-	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
 	  MVCD_delay_us(10000);
+	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+	  for(int i=0;i<10;i++) MVCD_delay_us(10000);
+//	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+//	  MVCD_delay_us(10000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
