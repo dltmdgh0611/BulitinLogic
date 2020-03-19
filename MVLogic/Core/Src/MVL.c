@@ -23,7 +23,6 @@ int LogicAnalyzer(GPIO_TypeDef* GPIOx, uint16_t pinnum,int curdelay, int delay, 
 		if(curdelay*10 == delay*S){
 			AX++;
 			if(AX == 64){
-				printf("2\n");
 				return 2;
 			}
 			_Bool readpin = HAL_GPIO_ReadPin(GPIOx, pinnum);

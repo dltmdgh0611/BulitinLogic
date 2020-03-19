@@ -32,6 +32,7 @@
 #include "MVCD_ST7920lib.h"
 #include "bitmaps.h"
 #include "MVL.h"
+#include <stdlib.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,8 +59,16 @@ int _write(int file, char *p, int len){
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
-
+uint8_t rx3_data;
+int rxlevel=0;
+char portname;
+char portnums[2] = "13";
+int portnumcount;
+int portnum;
+int cycle;
+int bits;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -101,6 +110,9 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2);
   MVCD_ST7920_baseinit();
@@ -108,6 +120,7 @@ int main(void)
   MVCD_LCDclear();
   HAL_Delay(1);
   HAL_TIM_Base_Start_IT(&htim3);
+  HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
 
 //  MVCD_DrawBitmap(cubelogo);
 //  HAL_Delay(5000);
@@ -129,10 +142,10 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
-	  MVCD_delay_us(10000);
-	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
-	  for(int i=0;i<10;i++) MVCD_delay_us(10000);
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET);
+//	  MVCD_delay_us(10000);
+//	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);
+//	  for(int i=0;i<2;i++) MVCD_delay_us(10000);
 //	  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
 //	  MVCD_delay_us(10000);
     /* USER CODE END WHILE */
@@ -184,8 +197,66 @@ void SystemClock_Config(void)
   }
 }
 
-/* USER CODE BEGIN 4 */
+/**
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
+  /* USART3_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(USART3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(USART3_IRQn);
+}
 
+/* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	if(huart->Instance == USART3){
+		HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
+		HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
+		if(rx3_data == 'X'){
+			HAL_UART_Transmit(&huart3, &rx3_data, 1, 10);
+		}
+		if(rx3_data == 'S'){
+			portname=0;
+			portnum=0;
+			portnumcount=0;
+			bits=0;
+			cycle=0;
+			rxlevel=0;
+			rxlevel++;
+		}
+
+		if(rxlevel==1){
+			if(rx3_data == 'N'){
+				rxlevel++;
+			}
+			else portname = rx3_data;
+		}
+		else if(rxlevel==2){
+			if(rx3_data == 'B'){
+				portnum = atoi(portnums);
+				rxlevel++;
+			}
+			portnums[portnumcount] = rx3_data;
+			portnumcount++;
+
+		}
+		else if(rxlevel==3){
+			if(rx3_data == 'C'){
+				rxlevel++;
+			}
+			else bits = rx3_data - '0';
+		}
+		else if(rxlevel==4){
+			if(rx3_data == 'E'){
+				rxlevel=0;
+				printf(" name : %c num : %d bit :%d cycle :%d \n",portname,portnum,bits,cycle);
+			}
+			else cycle = rx3_data - '0';
+		}
+
+	}
+}
 /* USER CODE END 4 */
 
 /**

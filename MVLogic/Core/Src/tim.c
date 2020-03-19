@@ -156,7 +156,7 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* tim_baseHandle)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if(htim->Instance == TIM3){
 		i++;
-		sel = LogicAnalyzer(GPIOB, GPIO_PIN_0, i, 10, MS,startTrigger);
+		sel = LogicAnalyzer(GPIOB, GPIO_PIN_3, i, 10, MS,startTrigger);
 		if(sel == 1) i=0;
 		else if(sel == 2) {
 
