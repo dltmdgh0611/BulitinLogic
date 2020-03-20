@@ -63,12 +63,16 @@ static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 uint8_t rx3_data;
 int rxlevel=0;
-char portname;
+
 char portnums[2] = "13";
 int portnumcount;
+char portname;
+
+GPIO_TypeDef* portnameT;
 int portnum;
 int cycle;
 int bits;
+_Bool SFlag;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -110,6 +114,7 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -120,6 +125,7 @@ int main(void)
   MVCD_LCDclear();
   HAL_Delay(1);
   HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim4);
   HAL_UART_Receive_IT(&huart3, &rx3_data, 1);
 
 //  MVCD_DrawBitmap(cubelogo);
@@ -230,7 +236,19 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 			if(rx3_data == 'N'){
 				rxlevel++;
 			}
-			else portname = rx3_data;
+			else{
+				portname = rx3_data;
+				switch(portname){
+					case 'a' : portnameT = GPIOA; break;
+					case 'b' : portnameT = GPIOB; break;
+					case 'c' : portnameT = GPIOC; break;
+					case 'd' : portnameT = GPIOD; break;
+					case 'e' : portnameT = GPIOE; break;
+					case 'f' : portnameT = GPIOF; break;
+					case 'g' : portnameT = GPIOG; break;
+
+				}
+			}
 		}
 		else if(rxlevel==2){
 			if(rx3_data == 'B'){
@@ -249,8 +267,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 		}
 		else if(rxlevel==4){
 			if(rx3_data == 'E'){
-				rxlevel=0;
+
 				printf(" name : %c num : %d bit :%d cycle :%d \n",portname,portnum,bits,cycle);
+				SFlag = 1;
 			}
 			else cycle = rx3_data - '0';
 		}
