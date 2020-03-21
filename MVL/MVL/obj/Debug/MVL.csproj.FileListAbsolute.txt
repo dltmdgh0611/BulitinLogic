@@ -1,0 +1,9 @@
+C:\Users\user\source\repos\MVL\MVL\bin\Debug\MVL.exe.config
+C:\Users\user\source\repos\MVL\MVL\bin\Debug\MVL.exe
+C:\Users\user\source\repos\MVL\MVL\bin\Debug\MVL.pdb
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.csprojAssemblyReference.cache
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.Form1.resources
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.Properties.Resources.resources
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.csproj.GenerateResource.cache
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.exe
+C:\Users\user\source\repos\MVL\MVL\obj\Debug\MVL.pdb
